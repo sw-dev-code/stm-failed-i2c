@@ -52,7 +52,7 @@ I2C_HandleTypeDef hi2c1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);;
+static HAL_StatusTypeDef MX_I2C1_Init(I2C_HandleTypeDef *hi2c);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -91,7 +91,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_SubGHz_Phy_Init();
   MX_GPIO_Init();
-  MX_I2C1_Init();
+//  MX_I2C1_Init();
+
+  MX_I2C1_Init(&hi2c1);//@Murata Init the i2c
+
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -260,43 +263,41 @@ static void MX_GPIO_Init(void)
   * @param None
   * @retval None
   */
-static void MX_I2C1_Init(void)
+
+HAL_StatusTypeDef MX_I2C1_Init(I2C_HandleTypeDef *hi2c)
 {
+  HAL_StatusTypeDef ret = HAL_OK;
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
 
-  /* USER CODE BEGIN I2C1_Init 0 */
-
-  /* USER CODE END I2C1_Init 0 */
-
-  /* USER CODE BEGIN I2C1_Init 1 */
-
-  /* USER CODE END I2C1_Init 1 */
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00000708;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  hi2c->Instance = I2C1;
+  hi2c->Init.Timing = 0x40000A0B;
+  hi2c->Init.OwnAddress1 = 0;
+  hi2c->Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c->Init.OwnAddress2 = 0;
+  hi2c->Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c->Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(hi2c) != HAL_OK)
   {
-    Error_Handler();
+    ret = HAL_ERROR;
   }
-//  /** Configure Analogue filter
-//  */
-//  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//  /** Configure Digital filter
-//  */
-//  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-}
 
+//  if (HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+//  {
+//    ret = HAL_ERROR;
+//  }
+//
+//  if (HAL_I2CEx_ConfigDigitalFilter(hi2c, 0) != HAL_OK)
+//  {
+//    ret = HAL_ERROR;
+//  }
+
+  return ret;
+}
 
 
 /* USER CODE BEGIN 4 */
